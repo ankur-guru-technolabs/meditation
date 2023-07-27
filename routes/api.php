@@ -29,4 +29,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('get-static-page', [CustomerController::class,'staticPage'])->name('get-static-page');
     Route::get('notification-setting', [CustomerController::class,'notificationSetting'])->name('notification-setting');
     Route::get('log-out', [CustomerController::class,'logout'])->name('log-out');
+
+    Route::post('contact-support', [CustomerController::class,'contactSupport'])->name('contact-support');
+    Route::get('contact-support-list', [CustomerController::class,'contactSupportList'])->name('contact-support-list');
+    // Route::post('contact-support-detail', [CustomerController::class,'contactSupportDetail'])->name('contact-support-detail');
+
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
+use App\Models\ContactSupport;
 use App\Models\User;
 use App\Models\Setting;
 use Illuminate\Http\Request;
@@ -48,7 +49,6 @@ class CustomerController extends BaseController
                 return $this->error($validateData->errors(),'Validation error',403);
             } 
 
-            
             $input              = $request->all();
             $input['gender']    = strtolower($input['gender']);  
             $user_data->update($input);
@@ -88,6 +88,58 @@ class CustomerController extends BaseController
             return $this->error($e->getMessage(), 'Exception occur');
         }
     }
+
+    // CONTACT SUPPORT 
+
+    public function contactSupport(Request $request){
+        try{
+            $validateData = Validator::make($request->all(), [
+                'name' => 'required',
+                'email' => 'required',
+                'description' => 'required',
+            ]);
+
+            if ($validateData->fails()) {
+                return $this->error($validateData->errors(),'Validation error',403);
+            }
+
+            $support                = new ContactSupport();
+            $support->user_id       = Auth::user()->id;
+            $support->name          = $request->name;
+            $support->email         = $request->email;
+            $support->description   = $request->description;
+            $support->save();
+
+            return $this->success([],'Request added successfully');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+   
+    // CONTACT SUPPORT LIST 
+
+    public function contactSupportList(Request $request){
+        try{
+            $data['contact_support'] = ContactSupport::where('user_id',Auth::user()->id)->get();
+            return $this->success($data,'Support list');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+   
+    // CONTACT SUPPORT DETAIL 
+
+    // public function contactSupportDetail(Request $request){
+    //     try{
+    //         $data['contact_support'] = ContactSupport::where('user_id',Auth::user()->id)->get();
+    //         return $this->success($data,'Support list');
+    //     }catch(Exception $e){
+    //         return $this->error($e->getMessage(),'Exception occur');
+    //     }
+    //     return $this->error('Something went wrong','Something went wrong');
+    // }
 
     // STATIC PAGE DATA
 
