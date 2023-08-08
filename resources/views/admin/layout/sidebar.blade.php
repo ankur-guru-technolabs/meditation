@@ -52,7 +52,58 @@
                         </li>
                     </ul>
                 </li>
-                <!-- <li class="nav-item {{isActivePrefix('static-pages','menu-open')}} mt-2" role="button">
+                <li class="nav-item {{isActivePrefix('category','menu-open')}} mt-2" role="button">
+                    <a class="nav-link dropDownMenu {{isActive('category.list')}}">
+                        <i class="nav-icon fa fa-qrcode"></i>
+                        <p>
+                            Category
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a class="nav-link {{isActive('category.list')}}" href="{{route('category.list')}}">
+                                <i class="fa fa-list-ul nav-icon"></i>
+                                <p>List</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item {{isActivePrefix('video','menu-open')}} mt-2" role="button">
+                    <a class="nav-link dropDownMenu {{isActive('video.list')}}">
+                        <i class="nav-icon fa fa-video"></i>
+                        <p>
+                            Video
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a class="nav-link {{isActive('video.list')}}" href="{{route('video.list')}}">
+                                <i class="fa fa-list-ul nav-icon"></i>
+                                <p>List</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+                <li class="nav-item {{isActivePrefix('feedback','menu-open')}} mt-2" role="button">
+                    <a class="nav-link dropDownMenu {{isActive('feedback.list')}}">
+                        <i class="nav-icon fa fa-comment"></i>
+                        <p>
+                            Feedback
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a class="nav-link {{isActive('feedback.list')}}" href="{{route('feedback.list')}}">
+                                <i class="fa fa-list-ul nav-icon"></i>
+                                <p>List</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li> 
+                <li class="nav-item {{isActivePrefix('static-pages','menu-open')}} mt-2" role="button">
                     <a class="nav-link dropDownMenu {{isActive('static-pages.list')}}">
                         <i class="nav-icon  fa fa-file-alt"></i>
                         <p>
@@ -68,7 +119,7 @@
                             </a>
                         </li>
                     </ul>
-                </li> -->
+                </li>
             </ul>
         </nav>
         <!-- /.sidebar-menu -->

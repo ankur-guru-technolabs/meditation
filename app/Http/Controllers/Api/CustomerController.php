@@ -78,7 +78,8 @@ class CustomerController extends BaseController
     
             if (!\Hash::check($request->old_password, $user_data->password)) {
                 $can_not_find = "Old password is wrong";
-                return $this->error($can_not_find); // Adjust the status code as needed
+                $data['old_password'][] = "Old password is wrong";
+                return $this->error($data,$can_not_find,403);  
             }
 
             $user_data->update(['password' => bcrypt($request->new_password)]);
@@ -131,15 +132,25 @@ class CustomerController extends BaseController
    
     // CONTACT SUPPORT DETAIL 
 
-    // public function contactSupportDetail(Request $request){
-    //     try{
-    //         $data['contact_support'] = ContactSupport::where('user_id',Auth::user()->id)->get();
-    //         return $this->success($data,'Support list');
-    //     }catch(Exception $e){
-    //         return $this->error($e->getMessage(),'Exception occur');
-    //     }
-    //     return $this->error('Something went wrong','Something went wrong');
-    // }
+    public function contactSupportDetail(Request $request){
+        try{
+            $validateData = Validator::make($request->all(), [
+                'support_id' => 'required',
+            ]);
+    
+            if ($validateData->fails()) {
+                return $this->error($validateData->errors(), 'Validation error', 403);
+            }
+            $data['contact_support'] = ContactSupport::where('id',$request->support_id)->first();
+            if(!empty($data['contact_support'])){
+                return $this->success($data,'Support detail');
+            }
+            return $this->error([],'Detail not found');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
 
     // STATIC PAGE DATA
 
@@ -167,7 +178,7 @@ class CustomerController extends BaseController
             if($user_data['is_notification_mute'] == 1){
                 $user_data['is_notification_mute'] = 0;
                 $user_data->save();
-                return $this->success([],'Notification enable successfully');
+               return $this->success([],'Notification enable successfully');
             }
         }catch(Exception $e){
             return $this->error($e->getMessage(),'Exception occur');

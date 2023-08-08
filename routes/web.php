@@ -35,6 +35,28 @@ Route::middleware(['admin'])->group(function () {
         Route::post('status/update', [UserController::class, 'updateStatus'])->name('status-update');
     });
 
+    Route::group(['prefix' => 'category','as'=>'category.'], function () {
+        Route::get('list', [AdminController::class, 'categoryList'])->name('list');
+        Route::get('add', [AdminController::class, 'categoryAdd'])->name('add');
+        Route::post('store', [AdminController::class, 'categoryStore'])->name('store');
+        Route::get('edit/{id}', [AdminController::class, 'categoryEdit'])->name('edit');
+        Route::post('update', [AdminController::class, 'categoryUpdate'])->name('update');
+        Route::get('delete/{id}', [AdminController::class, 'categoryDelete'])->name('delete');
+    });
+   
+    Route::group(['prefix' => 'video','as'=>'video.'], function () {
+        Route::get('list', [AdminController::class, 'videoList'])->name('list');
+        Route::get('add', [AdminController::class, 'videoAdd'])->name('add');
+        Route::post('store', [AdminController::class, 'videoStore'])->name('store');
+        Route::get('edit/{id}', [AdminController::class, 'videoEdit'])->name('edit');
+        Route::post('update', [AdminController::class, 'videoUpdate'])->name('update');
+        Route::get('delete/{id}', [AdminController::class, 'videoDelete'])->name('delete');
+    });
+
+    Route::group(['prefix' => 'feedback','as'=>'feedback.'], function () {
+        Route::get('list', [AdminController::class, 'feedbackList'])->name('list');
+    });
+    
     Route::group(['prefix' => 'static-pages','as'=>'static-pages.'], function () {
         Route::get('list', [AdminController::class, 'staticPagesList'])->name('list');
         Route::get('page-edit/{id}', [AdminController::class, 'pageEdit'])->name('page-edit');
