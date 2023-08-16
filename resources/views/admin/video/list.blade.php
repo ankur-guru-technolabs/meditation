@@ -26,8 +26,9 @@
                             <thead>
                                 <tr>
                                     <th>Id</th>
-                                    <th>Video</th> 
-                                    <th>Category</th> 
+                                    <th>Video</th>
+                                    <th>Category</th>
+                                    <th>Featured</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -35,8 +36,11 @@
                                 @foreach($videos as $key=>$video)
                                 <tr>
                                     <td>{{ ++$key }}</td>
-                                    <td>{{$video->title}}</td> 
-                                    <td>{{$video->category->title}}</td> 
+                                    <td>{{$video->title}}</td>
+                                    <td>{{$video->category->title}}</td>
+                                    <td>
+                                        <input type="checkbox" data-toggle="toggle" class="featured_video_switch" id="featured_video_switch"   data-on="Yes" data-off="No" data-size="xs" data-id="{{$video->id}}" data-onstyle="success" data-offstyle="danger"  @if($video->is_featured == 1) checked @endif>
+                                    </td>
                                     <td>
                                         <a href="{{route('video.edit',['id' => $video->id])}}">
                                             <i class="fa fa-edit"></i>
@@ -60,6 +64,22 @@
 <script>
     $(document).ready(function() {
         $('#video_list_table').DataTable();
+    });
+    $('.featured_video_switch').change(function() {
+        var is_featured = $(this).prop('checked') ? 1 : 0;
+        var id = $(this).data('id');
+        var url = "{{ route('video.featured-update') }}";
+        $.ajax({
+            url: url,
+            type: "POST",
+            data: { id: id,is_featured: is_featured, "_token": "{{ csrf_token() }}" },
+            success: function(data) {
+                window.location.reload();
+            },
+            error: function(xhr) {
+                console.log(xhr.responseJSON.message);
+            }
+        });
     });
 </script>
 @endsection

@@ -34,7 +34,7 @@ Route::middleware(['admin'])->group(function () {
         Route::get('details/{id}', [UserController::class, 'detail'])->name('detail');
         Route::post('status/update', [UserController::class, 'updateStatus'])->name('status-update');
     });
-
+    
     Route::group(['prefix' => 'category','as'=>'category.'], function () {
         Route::get('list', [AdminController::class, 'categoryList'])->name('list');
         Route::get('add', [AdminController::class, 'categoryAdd'])->name('add');
@@ -51,6 +51,7 @@ Route::middleware(['admin'])->group(function () {
         Route::get('edit/{id}', [AdminController::class, 'videoEdit'])->name('edit');
         Route::post('update', [AdminController::class, 'videoUpdate'])->name('update');
         Route::get('delete/{id}', [AdminController::class, 'videoDelete'])->name('delete');
+        Route::post('featured/update', [AdminController::class, 'updatefeatured'])->name('featured-update');
     });
 
     Route::group(['prefix' => 'feedback','as'=>'feedback.'], function () {

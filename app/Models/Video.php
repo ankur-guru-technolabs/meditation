@@ -12,17 +12,26 @@ class Video extends Model
     protected $fillable = [
         'title',
         'category_id',
-        'duration'
+        'duration',
+        'is_featured',
     ];
 
-    protected $appends = ['thumbnail_image_url'];
+    protected $appends = ['thumbnail_image_url','video_url'];
 
     // ACCESSOR
 
     public function getThumbnailImageUrlAttribute()
     {
-        if($this->type == 'video_thumbnail_image'){
-            return asset('/video_thumbnail_image/' . $this->file_name);
+        if($this->image->type == 'video_thumbnail_image'){
+            return asset('/video/' . $this->image->file_name);
+        }
+        return null;
+    }
+   
+    public function getVideoUrlAttribute()
+    {
+        if($this->video->type == 'video'){
+            return asset('/video/' . $this->video->file_name);
         }
         return null;
     }

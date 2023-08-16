@@ -133,6 +133,27 @@ class AdminController extends BaseController
 
             $image_data->delete();
         }
+
+        // Video related delete
+        
+        $video_id         =     Video::where('category_id',$id)->pluck('id')->toArray();
+        $video_image_data =     Image::whereIn('type_id',$video_id)->where(function ($query) {
+                                    $query->where('type', 'video_thumbnail_image')
+                                        ->orWhere('type', 'video');
+                                })->get();
+
+        if($video_image_data){
+            foreach($video_image_data as $key=>$video_image){
+                $path = public_path('video/' . $video_image->file_name);
+                if (!is_writable($path)) {
+                    chmod($path, 0777);
+                }
+                File::delete($path);
+            }
+            $video_image_data->each->delete();
+        }
+        Video::whereIn('id', $video_id)->delete();
+
         return redirect()->route('category.list')->with('message','Category Deleted Successfully');
     }
 
@@ -296,6 +317,21 @@ class AdminController extends BaseController
             $image_data->each->delete();
         }
         return redirect()->route('video.list')->with('message','Video Deleted Successfully');
+    }
+
+    public function updatefeatured(Request $request){
+        try{
+            $video = Video::where('id',$request->id)->first();
+            if($video){ 
+                $video->is_featured = $request->is_featured; 
+                $video->save();
+                return $this->success([],'Featured change successfully');
+            }
+            return $this->error('Video not found','Video not found');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
     }
 
     // FEEDBACK

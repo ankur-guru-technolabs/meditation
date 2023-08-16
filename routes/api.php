@@ -23,15 +23,25 @@ Route::post('register', [AuthController::class, 'register'])->name('register');
 Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('get-static-page', [CustomerController::class,'staticPage'])->name('get-static-page');
 
+Route::get('get-category-list', [CustomerController::class,'getCategoryList'])->name('get-category-list');
+Route::get('get-video-list/{id}', [CustomerController::class,'getVideoList'])->name('get-video-list');
+Route::get('get-featured-video-list', [CustomerController::class,'getFeaturedList'])->name('get-featured-list');
+
 Route::middleware('auth:api')->group(function () {
     Route::get('get-user-profile', [CustomerController::class,'getProfile'])->name('get-user-profile');
     Route::post('update-profile', [CustomerController::class,'updateProfile'])->name('update-profile');
     Route::post('update-password', [CustomerController::class,'updatePassword'])->name('update-password');
     Route::get('notification-setting', [CustomerController::class,'notificationSetting'])->name('notification-setting');
-    Route::get('log-out', [CustomerController::class,'logout'])->name('log-out');
-
+    
+    Route::get('get-bookmark-list', [CustomerController::class,'getBookmarkList'])->name('get-bookmark-list');
+    Route::post('add-to-bookmark', [CustomerController::class,'addToBookmark'])->name('add-to-bookmark');
+   
+    Route::get('get-play-list', [CustomerController::class,'getPlayList'])->name('get-play-list');
+    Route::post('add-to-playlist', [CustomerController::class,'addToPlayList'])->name('add-to-playlist');
+    
     Route::post('contact-support', [CustomerController::class,'contactSupport'])->name('contact-support');
     Route::get('contact-support-list', [CustomerController::class,'contactSupportList'])->name('contact-support-list');
     Route::post('contact-support-detail', [CustomerController::class,'contactSupportDetail'])->name('contact-support-detail');
-
+    
+    Route::get('log-out', [CustomerController::class,'logout'])->name('log-out');
 });

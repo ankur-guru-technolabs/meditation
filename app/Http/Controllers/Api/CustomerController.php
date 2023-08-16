@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\BaseController;
 use App\Http\Controllers\Controller;
+use App\Models\Bookmark;
+use App\Models\Category;
 use App\Models\ContactSupport;
 use App\Models\User;
 use App\Models\Setting;
+use App\Models\Video;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Helper; 
@@ -26,6 +29,7 @@ class CustomerController extends BaseController
                 $data['user_data'] = $user_data;
                 return $this->success($data,'User profile data');
             }
+            return $this->error('Something went wrong','Something went wrong');
         }catch(Exception $e){
             return $this->error($e->getMessage(),'Exception occur');
         }
@@ -88,6 +92,68 @@ class CustomerController extends BaseController
         } catch (Exception $e) {
             return $this->error($e->getMessage(), 'Exception occur');
         }
+    }
+
+    // GET BOOKMARK LIST
+    
+    public function getBookmarkList(Request $request){
+        try{ 
+            $user_id = Auth::user()->id;
+            $bookmark_video_list = Bookmark::with(['video:id,title'])->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+          
+            $formattedBookmarkList = $bookmark_video_list->map(function ($bookmark) {
+                if ($bookmark->video) {
+                    $bookmark->video->makeHidden(['image','video']);
+                }
+                return $bookmark;
+            });
+
+            if(!empty($bookmark_video_list)){
+                $data['bookmark_video_list']    = $formattedBookmarkList->values();
+                $data['current_page']           = $bookmark_video_list->currentPage();
+                $data['per_page']               = $bookmark_video_list->perPage();
+                $data['total']                  = $bookmark_video_list->total();
+                $data['last_page']              = $bookmark_video_list->lastPage();
+                return $this->success($data,'Bookmark list');
+            }
+            return $this->error('Something went wrong','Something went wrong');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+
+    // ADD TO BOOKMARK
+
+    public function addToBookmark(Request $request){
+        try{
+            $validateData = Validator::make($request->all(), [
+                'video_id' => 'required',
+            ]);
+
+            if ($validateData->fails()) {
+                return $this->error($validateData->errors(),'Validation error',403);
+            }
+
+            $user_id    = Auth::user()->id;
+            $video_is_exist_in_bookmark   =  Bookmark::where('user_id',$user_id)->where('video_id',$request->video_id)->first();
+
+            if(!empty($video_is_exist_in_bookmark)){
+                $video_is_exist_in_bookmark->delete();
+                return $this->success([],'Removed from bookmark successfully');
+            }
+
+            $bookmark                = new Bookmark();
+            $bookmark->user_id       = Auth::user()->id;
+            $bookmark->video_id      = $request->video_id;
+            $bookmark->video_title   = Video::where('id',$request->video_id)->pluck('title')->first();
+            $bookmark->save();
+
+            return $this->success([],'Added to bookmark successfully');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
     }
 
     // CONTACT SUPPORT 
@@ -185,7 +251,68 @@ class CustomerController extends BaseController
         }
         return $this->error('Something went wrong','Something went wrong');
     }
+    
+    // GET CATEGORY LIST
 
+    public function getCategoryList(Request $request){
+        try{ 
+            $category_list = Category::with('image:id,type_id,file_name,type')->select('id','title','button_title')->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            if(!empty($category_list)){
+                $data['category_list'] = $category_list->values();
+                $data['current_page']  = $category_list->currentPage();
+                $data['per_page']      = $category_list->perPage();
+                $data['total']         = $category_list->total();
+                $data['last_page']     = $category_list->lastPage();
+                
+                return $this->success($data,'Category list');
+            }
+            return $this->error('Something went wrong','Something went wrong');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+    
+    // GET VIDEO LIST
+    
+    public function getVideoList(Request $request,$id){
+        try{ 
+            $video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type'])->select('id','title','category_id','duration')->where('category_id',$id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            if(!empty($video_list)){
+                $data['video_list']    = $video_list->values();
+                $data['current_page']  = $video_list->currentPage();
+                $data['per_page']      = $video_list->perPage();
+                $data['total']         = $video_list->total();
+                $data['last_page']     = $video_list->lastPage();
+                return $this->success($data,'Video list');
+            }
+            return $this->error('Something went wrong','Something went wrong');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+    
+    // GET FEATURED LIST
+    
+    public function getFeaturedList(Request $request){
+        try{ 
+            $featured_video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type'])->select('id','title','category_id','duration')->where('is_featured',1)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            if(!empty($featured_video_list)){
+                $data['featured_video_list']    = $featured_video_list->values();
+                $data['current_page']           = $featured_video_list->currentPage();
+                $data['per_page']               = $featured_video_list->perPage();
+                $data['total']                  = $featured_video_list->total();
+                $data['last_page']              = $featured_video_list->lastPage();
+                return $this->success($data,'Video list');
+            }
+            return $this->error('Something went wrong','Something went wrong');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+    
     // USER LOGOUT
 
     public function logout(){
