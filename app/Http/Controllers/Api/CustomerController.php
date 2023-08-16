@@ -99,10 +99,10 @@ class CustomerController extends BaseController
     public function getBookmarkList(Request $request){
         try{ 
             $user_id = Auth::user()->id;
-            $bookmark_video_list = Bookmark::with(['video:id,title'])->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
-          
+            $bookmark_video_list = Bookmark::with(['video:id,title,category_id'])->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $formattedBookmarkList = $bookmark_video_list->map(function ($bookmark) {
                 if ($bookmark->video) {
+                    $bookmark->category_title = $bookmark->video->category->title;
                     $bookmark->video->makeHidden(['image','video']);
                 }
                 return $bookmark;
@@ -277,9 +277,16 @@ class CustomerController extends BaseController
     
     public function getVideoList(Request $request,$id){
         try{ 
-            $video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type'])->select('id','title','category_id','duration')->where('category_id',$id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type','category:id,title','userBookmarks'])->select('id','title','category_id','duration')->where('category_id',$id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $transformed_video_list  = $video_list->getCollection()->transform(function ($item) {
+                $item->category_title = $item->category->title; 
+                $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false;
+                unset($item->category);  
+                unset($item->userBookmarks);  
+                return $item;
+            });
             if(!empty($video_list)){
-                $data['video_list']    = $video_list->values();
+                $data['video_list']    = $transformed_video_list->values();
                 $data['current_page']  = $video_list->currentPage();
                 $data['per_page']      = $video_list->perPage();
                 $data['total']         = $video_list->total();

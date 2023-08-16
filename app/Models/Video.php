@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Auth;
 
 class Video extends Model
 {
@@ -51,5 +52,14 @@ class Video extends Model
     public function video()
     {
         return $this->hasOne(Image::class,'type_id','id')->where('type','video');
+    }
+
+    public function userBookmarks()
+    {
+        $user = Auth::guard('api')->user();
+        if($user) {
+            return $this->hasMany(Bookmark::class, 'video_id')->where('user_id',$user->id);
+        }
+        return $this->hasMany(Bookmark::class, 'video_id')->where('id',0);
     }
 }
