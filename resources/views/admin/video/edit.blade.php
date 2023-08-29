@@ -15,6 +15,7 @@
                     <div class="p-4">
                         <form method="post" action="{{route('video.update')}}" enctype="multipart/form-data">
                             <input type="hidden" name="id" value="{{$videos->id}}">
+                            <input type="hidden" name="category" value="{{$videos->category->id}}">
                             @csrf
                             <div>
                                 <div class="form-group">
@@ -30,7 +31,7 @@
                             <div>
                                 <div class="form-group">
                                     <label class="form-label">Category</label>
-                                    <select class="form-control" name="category">
+                                    <select class="form-control" name="category1" disabled>
                                         <option value="">Select Category</option>
                                         @foreach($categories as $category)
                                         <option value="{{$category->id}}" {{ ($category->id == $videos->category->id) ? "selected" : '' }}>{{$category->title}}</option>
@@ -66,6 +67,20 @@
                                 @if($errors->has('video'))
                                 <small class="text-danger error">
                                     {{ $errors->first('video') }}
+                                </small>
+                                @endif
+                            </div>
+                            <div>
+                                <div>
+                                    <p><b>Can view free user</b></p>
+                                    <input type="radio" name="can_view_free_user" value="1" @checked($videos->can_view_free_user == 1)/>
+                                    <label for="yes">Yes</label>
+                                    <input type="radio" class="ml-5" name="can_view_free_user" value="0" @checked($videos->can_view_free_user == 0)/>
+                                    <label for="no">No</label>
+                                </div>
+                                @if($errors->has('can_view_free_user'))
+                                <small class="text-danger error">
+                                    {{ $errors->first('can_view_free_user') }}
                                 </small>
                                 @endif
                             </div>

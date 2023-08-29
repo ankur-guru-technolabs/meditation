@@ -35,10 +35,21 @@ Route::middleware('auth:api')->group(function () {
     
     Route::get('get-bookmark-list', [CustomerController::class,'getBookmarkList'])->name('get-bookmark-list');
     Route::post('add-to-bookmark', [CustomerController::class,'addToBookmark'])->name('add-to-bookmark');
-   
-    Route::get('get-play-list', [CustomerController::class,'getPlayList'])->name('get-play-list');
-    Route::post('add-to-playlist', [CustomerController::class,'addToPlayList'])->name('add-to-playlist');
     
+    Route::post('create-playlist', [CustomerController::class,'createPlayList'])->name('get-play-list');
+    Route::get('get-playlist', [CustomerController::class,'getPlayList'])->name('get-play-list');
+    Route::post('add-to-playlist', [CustomerController::class,'addToPlayList'])->name('add-to-playlist');
+    Route::post('playlist-detail', [CustomerController::class,'PlayListDetail'])->name('playlist-detail');
+    Route::post('delete-playlist', [CustomerController::class,'deletePlayList'])->name('delete-playlist');
+    
+    Route::get('get-category-name', [CustomerController::class,'getCategoryName'])->name('get-category-name');
+    Route::get('get-video-name/{id}', [CustomerController::class,'getVideoName'])->name('get-video-name');
+    Route::post('get-statistics', [CustomerController::class,'getStatistics'])->name('get-statistics');
+    Route::post('search-video', [CustomerController::class,'searchVideo'])->name('search-video');
+    Route::get('play-video/{id}', [CustomerController::class,'playVideo'])->name('play-video');
+    
+    Route::post('store-watched-video-duration', [CustomerController::class,'storeWatchedVideoDuration'])->name('store-watched-video-duration');
+
     Route::post('contact-support', [CustomerController::class,'contactSupport'])->name('contact-support');
     Route::get('contact-support-list', [CustomerController::class,'contactSupportList'])->name('contact-support-list');
     Route::post('contact-support-detail', [CustomerController::class,'contactSupportDetail'])->name('contact-support-detail');

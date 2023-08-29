@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Support\Facades\File;
 use Illuminate\Http\Request;
 use App\Http\Controllers\BaseController;
+use Illuminate\Support\Str;
 use App\Models\Category;
 use App\Models\ContactSupport;
 use App\Models\Image;
@@ -172,10 +173,11 @@ class AdminController extends BaseController
     public function videoStore(Request $request){
         
         $validator = Validator::make($request->all(),[
-            'title'   =>"required",
-            'category'=>"required", 
-            'image'   =>"required|mimes:jpeg,png,jpg",
-            'video'   =>"required|mimes:mp4,mov",
+            'title'               => "required",
+            'category'            => "required", 
+            'image'               => "required|mimes:jpeg,png,jpg",
+            'video'               => "required|mimes:mp4,mov",
+            'can_view_free_user'  => "required",
         ]);
 
         if ($validator->fails())
@@ -183,12 +185,24 @@ class AdminController extends BaseController
             return back()->withInput()->withErrors($validator);
         }
 
-        $getID3              = new getID3();
+        $getID3                     = new getID3();
+        do {
+            $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            $code = '';
+            $code .= substr(str_shuffle('ABCDEFGHIJKLMNOPQRSTUVWXYZ'), 0, 1);
+            $code .= substr(str_shuffle('abcdefghijklmnopqrstuvwxyz'), 0, 1);
+            $code .= substr(str_shuffle('0123456789'), 0, 1);
+            for ($i = 0; $i < 4; $i++) {
+                $code .= $characters[rand(0, strlen($characters) - 1)];
+            }
+        } while (Video::where("unique_id", "=", $code)->first());
 
-        $video               = new Video;
-        $video->title        = $request->title;
-        $video->category_id  = $request->category;
-        $video->duration     = date('H:i:s.v', $getID3->analyze($request->file('video'))['playtime_seconds']);
+        $video                      = new Video;
+        $video->title               = $request->title;
+        $video->category_id         = $request->category;
+        $video->duration            = date('H:i:s.v', $getID3->analyze($request->file('video'))['playtime_seconds']);
+        $video->can_view_free_user  = $request->can_view_free_user;
+        $video->unique_id           = $code;
         $video->save();
 
         $folderPath = public_path().'/video';
@@ -229,6 +243,7 @@ class AdminController extends BaseController
         $validator = Validator::make($request->all(),[
             'title'   =>"required",
             'category'=>"required", 
+            'can_view_free_user'  => "required",
         ]);
 
         if ($validator->fails())
@@ -240,6 +255,7 @@ class AdminController extends BaseController
         if ($video) {
             $video->title        = $request->title;
             $video->category_id  = $request->category;
+            $video->can_view_free_user  = $request->can_view_free_user;
             $video_data = $video->save();
 
             $folderPath = public_path().'/video';

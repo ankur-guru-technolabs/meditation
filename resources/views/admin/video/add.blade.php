@@ -64,6 +64,20 @@
                                 </small>
                                 @endif
                             </div>
+                            <div>
+                                <div>
+                                    <p><b>Can view free user</b></p>
+                                    <input type="radio" name="can_view_free_user" value="1"/>
+                                    <label for="yes">Yes</label>
+                                    <input type="radio" class="ml-5" name="can_view_free_user" value="0"  checked="checked"/>
+                                    <label for="no">No</label>
+                                </div>
+                                @if($errors->has('can_view_free_user'))
+                                <small class="text-danger error">
+                                    {{ $errors->first('can_view_free_user') }}
+                                </small>
+                                @endif
+                            </div>
                             <div class="row pt-4">
                                 <div class="col s12 m12 input-field">
                                     <button type="submit" class="btn bg-gradient-primary">Save</button>

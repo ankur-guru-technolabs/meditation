@@ -15,6 +15,8 @@ class Video extends Model
         'category_id',
         'duration',
         'is_featured',
+        'unique_id',
+        'can_view_free_user'
     ];
 
     protected $appends = ['thumbnail_image_url','video_url'];
