@@ -103,7 +103,7 @@ class CustomerController extends BaseController
     public function getBookmarkList(Request $request){
         try{ 
             $user_id = Auth::user()->id;
-            $bookmark_video_list = Bookmark::with(['video:id,title,category_id,unique_idan_view_free_user'])->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $bookmark_video_list = Bookmark::with(['video:id,title,category_id,unique_id,can_view_free_user'])->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $formattedBookmarkList = $bookmark_video_list->map(function ($bookmark) {
                 if ($bookmark->video) {
                     $bookmark->category_title = $bookmark->video->category->title ?? null;
@@ -224,7 +224,7 @@ class CustomerController extends BaseController
         try{ 
             $user_id     = Auth::user()->id;
             $playlist_id = $request->playlist_id;
-            $playlist_video_list = PlaylistDetail::with(['video:id,title,category_id,unique_idan_view_free_user'])->where('playlist_id',$playlist_id)->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $playlist_video_list = PlaylistDetail::with(['video:id,title,category_id,unique_id,can_view_free_user'])->where('playlist_id',$playlist_id)->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $formattedPlayList = $playlist_video_list->map(function ($playlist) {
                 if ($playlist->video) {
                     $playlist->category_title = $playlist->video->category->title ?? null;
@@ -559,7 +559,7 @@ class CustomerController extends BaseController
     
     public function getVideoList(Request $request,$id){
         try{ 
-            $video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type','category:id,title','userBookmarks'])->select('id','title','category_id','duration','unique_id','can_view_free_user')->where('category_id',$id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type','category:id,title','userBookmarks'])->select('id','title','category_id','duration','unique_id','can_view_free_user','video_type')->where('category_id',$id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $transformed_video_list  = $video_list->getCollection()->transform(function ($item) {
                 $item->category_title = $item->category->title; 
                 $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false;

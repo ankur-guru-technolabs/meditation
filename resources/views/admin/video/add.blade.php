@@ -78,6 +78,20 @@
                                 </small>
                                 @endif
                             </div>
+                            <div>
+                                <div>
+                                    <p><b>Video type</b></p>
+                                    <input type="radio" name="video_type" value="1"/>
+                                    <label for="paid">Paid</label>
+                                    <input type="radio" class="ml-5" name="video_type" value="0"  checked="checked"/>
+                                    <label for="free">Free</label>
+                                </div>
+                                @if($errors->has('video_type'))
+                                <small class="text-danger error">
+                                    {{ $errors->first('video_type') }}
+                                </small>
+                                @endif
+                            </div>
                             <div class="row pt-4">
                                 <div class="col s12 m12 input-field">
                                     <button type="submit" class="btn bg-gradient-primary">Save</button>

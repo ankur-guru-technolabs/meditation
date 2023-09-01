@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Temp;
 use App\Models\User;
 use Exception;
+use Helper;
 use Validator;
 
 class AuthController extends BaseController
@@ -134,6 +135,7 @@ class AuthController extends BaseController
                 'birth_date'       => 'required',
                 'gender'           => 'required',
                 'password'         => 'required',
+                'fcm_token'        => 'required',
             ]);
 
             if ($validateData->fails()) {
@@ -147,6 +149,11 @@ class AuthController extends BaseController
 
            $user_data          = User::create($input);
            $data['token']      = $user_data->createToken('Auth token')->accessToken;
+
+           $title = "Welcome to Meditation";
+           $message = "Welcome to Meditation"; 
+           Helper::send_notification('single', 0, $user_data->id, $title, 'welcome', $message, []);
+
            return $this->success($data,'Registered successfully');
 
         }catch(Exception $e){
@@ -162,6 +169,7 @@ class AuthController extends BaseController
             $validateData = Validator::make($request->all(), [
                 'phone_no'         => 'required|string|max:20',
                 'password'         => 'required',
+                'fcm_token'        => 'required',
             ]);
 
             if ($validateData->fails()) {
@@ -181,6 +189,10 @@ class AuthController extends BaseController
             ];
 
             if (auth()->attempt($credential_data)) {
+                $user = User::Where('phone_no','=', $request->phone_no)->first();
+                $user->tokens()->delete();
+                $user->fcm_token = $request->fcm_token;
+                $user->save();
                 $data['token'] = auth()->user()->createToken('Auth token')->accessToken;
                 return $this->success($data,'Login successfully');
             } 

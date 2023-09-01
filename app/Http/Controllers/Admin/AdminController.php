@@ -178,6 +178,7 @@ class AdminController extends BaseController
             'image'               => "required|mimes:jpeg,png,jpg",
             'video'               => "required|mimes:mp4,mov",
             'can_view_free_user'  => "required",
+            'video_type'          => "required",
         ]);
 
         if ($validator->fails())
@@ -202,6 +203,7 @@ class AdminController extends BaseController
         $video->category_id         = $request->category;
         $video->duration            = date('H:i:s.v', $getID3->analyze($request->file('video'))['playtime_seconds']);
         $video->can_view_free_user  = $request->can_view_free_user;
+        $video->video_type          = $request->video_type;
         $video->unique_id           = $code;
         $video->save();
 
@@ -229,6 +231,12 @@ class AdminController extends BaseController
         $final_array = array($media_array,$video_array);
 
         Image::insert($final_array);
+
+        $title = $request->title." has been uploaded to the app";
+        $message = $request->title." has been uploaded to the app";
+        $data['image'] = asset('/video/' . $filename); 
+        Helper::send_notification_by_admin($title,$message,$data);
+
         return redirect()->route('video.list')->with('message','Video Added Successfully'); 
     }
     
@@ -253,9 +261,10 @@ class AdminController extends BaseController
 
         $video = Video::find($request->id);
         if ($video) {
-            $video->title        = $request->title;
-            $video->category_id  = $request->category;
+            $video->title               = $request->title;
+            $video->category_id         = $request->category;
             $video->can_view_free_user  = $request->can_view_free_user;
+            $video->video_type          = $request->video_type;
             $video_data = $video->save();
 
             $folderPath = public_path().'/video';

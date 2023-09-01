@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('is_featured')->default(0);
             $table->string('unique_id')->nullable();
             $table->integer('can_view_free_user')->default(0);
+            $table->integer('video_type')->default(0);
             $table->timestamps();
         });
     }
