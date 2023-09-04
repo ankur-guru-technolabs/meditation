@@ -89,7 +89,7 @@ class Helper
         }
 
         $accesstoken = env('FCM_KEY');
-        $image = isset($custom['image']) ? $custom['image'] : asset('images/meet-now.png');
+        $image = isset($custom['image']) ? $custom['image'] : asset('images/meditation.png');
         $data = [
             "registration_ids" => $registration_ids,
             "notification" => [

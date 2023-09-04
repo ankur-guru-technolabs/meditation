@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Bookmark;
 use App\Models\Category;
 use App\Models\ContactSupport;
+use App\Models\Notification;
 use App\Models\Playlist;
 use App\Models\PlaylistDetail;
 use App\Models\User;
@@ -16,6 +17,7 @@ use App\Models\WatchVideoDuration;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
+use File; 
 use Helper; 
 use Validator;
 use Exception;
@@ -534,6 +536,55 @@ class CustomerController extends BaseController
         return $this->error('Something went wrong','Something went wrong');
     }
     
+    // NOTIFICATION LIST
+
+    public function notificationList(Request $request){
+        try{
+            $notification_id  = Notification::where('receiver_id',Auth::id())->orderBy('id','desc')->take(30)->pluck('id')->toArray();
+            Notification::whereNotIn('id', $notification_id)->where('receiver_id',Auth::id())->delete();
+
+            $notification_data  = Notification::where('receiver_id',Auth::id())->orderBy('id','desc')->take(30)->get();
+            $data['notification_data'] = $notification_data->map(function ($notification){
+                $date = date('d/m/Y', strtotime($notification->created_at));
+
+                if($date == date('d/m/Y')) {
+                    $notification->date = 'Today';
+                }else if($date == date('d/m/Y', strtotime('-1 day'))) {
+                    $notification->date = 'Yesterday';
+                }else{
+                    $notification->date = date('d M', strtotime($notification->created_at));
+                }
+
+                $notification_cus_data = json_decode($notification->data,true);
+                if (isset($notification_cus_data['image'])) {
+                    $imageName = basename(parse_url($notification_cus_data['image'], PHP_URL_PATH));
+                    $folderPath = public_path('video');
+                    $notification['image'] = file_exists($folderPath . '/' . $imageName) ? $notification_cus_data['image'] : asset('images/meditation.png');
+                } else {
+                    $notification['image'] = asset('images/meditation.png');
+                }
+                return $notification;
+            })->values();
+
+            return $this->success($data,'Notification data');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+    
+    // NOTIFICATION READ
+    
+    public function notificationRead(){
+        try{
+            Notification::where('receiver_id',Auth::id())->update(['status'=>1]);
+            return $this->success([],'Notification read successfully');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+
     // GET CATEGORY LIST
 
     public function getCategoryList(Request $request){

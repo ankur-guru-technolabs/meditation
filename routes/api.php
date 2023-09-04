@@ -31,6 +31,9 @@ Route::middleware('auth:api')->group(function () {
     Route::get('get-user-profile', [CustomerController::class,'getProfile'])->name('get-user-profile');
     Route::post('update-profile', [CustomerController::class,'updateProfile'])->name('update-profile');
     Route::post('update-password', [CustomerController::class,'updatePassword'])->name('update-password');
+
+    Route::get('get-notification-list', [CustomerController::class,'notificationList'])->name('get-notification-list');
+    Route::get('notification-read', [CustomerController::class,'notificationRead'])->name('notification-read');
     Route::get('notification-setting', [CustomerController::class,'notificationSetting'])->name('notification-setting');
     
     Route::get('get-bookmark-list', [CustomerController::class,'getBookmarkList'])->name('get-bookmark-list');
