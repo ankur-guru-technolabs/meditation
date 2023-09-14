@@ -105,7 +105,7 @@ class CustomerController extends BaseController
     public function getBookmarkList(Request $request){
         try{ 
             $user_id = Auth::user()->id;
-            $bookmark_video_list = Bookmark::with(['video:id,title,category_id,unique_id,can_view_free_user'])->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $bookmark_video_list = Bookmark::with(['video:id,title,category_id,unique_id,can_view_free_user,duration'])->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $formattedBookmarkList = $bookmark_video_list->map(function ($bookmark) {
                 if ($bookmark->video) {
                     $bookmark->category_title = $bookmark->video->category->title ?? null;
@@ -698,6 +698,13 @@ class CustomerController extends BaseController
     public function getFeaturedList(Request $request){
         try{ 
             $featured_video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type'])->select('id','title','category_id','duration','unique_id','can_view_free_user')->where('is_featured',1)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $transformed_video_list  = $featured_video_list->getCollection()->transform(function ($item) {
+                $item->category_title = $item->category->title; 
+                $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false;
+                unset($item->category);  
+                unset($item->userBookmarks);  
+                return $item;
+            });
             if(!empty($featured_video_list)){
                 $data['featured_video_list']    = $featured_video_list->values();
                 $data['current_page']           = $featured_video_list->currentPage();
