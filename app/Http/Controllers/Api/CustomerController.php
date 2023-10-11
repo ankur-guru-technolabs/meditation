@@ -350,7 +350,7 @@ class CustomerController extends BaseController
             $interval   = $datetime1->diff($datetime2);
             $days = $interval->format('%a') + 1;
 
-            $query = WatchVideoDuration::where('user_id', Auth::id())->whereBetween('play_date', [$start_date, $end_date])->select('play_date',\DB::raw("CAST(SUM(duration) AS UNSIGNED) as total_duration_in_second"),\DB::raw('MONTH(play_date) month'),\DB::raw('MONTHNAME(play_date) as month_name'),\DB::raw('DAYNAME(play_date) as day_name'));
+            $query = WatchVideoDuration::where('user_id', Auth::id())->whereBetween('play_date', [$start_date, $end_date])->select('play_date',\DB::raw("CAST(SUM(duration) AS UNSIGNED) as total_duration_in_second"),\DB::raw('MONTH(play_date) month'),\DB::raw('DATE_FORMAT(play_date, "%b") as month_name'),\DB::raw('DATE_FORMAT(play_date, "%a") as day_name'));
             $query = $query->when($request->has('category_id'), function ($query) use ($request) {
                 return $query->where('category_id', $request->category_id);
             });
