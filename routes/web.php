@@ -53,6 +53,15 @@ Route::middleware(['admin'])->group(function () {
         Route::get('delete/{id}', [AdminController::class, 'videoDelete'])->name('delete');
         Route::post('featured/update', [AdminController::class, 'updatefeatured'])->name('featured-update');
     });
+ 
+    Route::group(['prefix' => 'pdf','as'=>'pdf.'], function () {
+        Route::get('list', [AdminController::class, 'pdfList'])->name('list');
+        Route::get('add', [AdminController::class, 'pdfAdd'])->name('add');
+        Route::post('store', [AdminController::class, 'pdfStore'])->name('store');
+        Route::get('edit/{id}', [AdminController::class, 'pdfEdit'])->name('edit');
+        Route::post('update', [AdminController::class, 'pdfUpdate'])->name('update');
+        Route::get('delete/{id}', [AdminController::class, 'pdfDelete'])->name('delete');
+    });
 
     Route::group(['prefix' => 'feedback','as'=>'feedback.'], function () {
         Route::get('list', [AdminController::class, 'feedbackList'])->name('list');

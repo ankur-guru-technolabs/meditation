@@ -27,6 +27,9 @@ class Image extends Model
         if($this->type == 'video_thumbnail_image' || $this->type == 'video'){
             return asset('/video/' . $this->file_name);
         }
+        if($this->type == 'pdf_thumbnail_image' || $this->type == 'pdf'){
+            return asset('/pdf/' . $this->file_name);
+        }
         return null;
     }
 }

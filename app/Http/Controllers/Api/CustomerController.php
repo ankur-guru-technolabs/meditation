@@ -8,9 +8,11 @@ use App\Models\Bookmark;
 use App\Models\Category;
 use App\Models\ContactSupport;
 use App\Models\Notification;
+use App\Models\Pdf;
 use App\Models\Playlist;
 use App\Models\PlaylistDetail;
 use App\Models\User;
+use App\Models\UserSubscription;
 use App\Models\Setting;
 use App\Models\Video;
 use App\Models\WatchVideoDuration;
@@ -376,7 +378,8 @@ class CustomerController extends BaseController
                 floor(($grandTotal % 3600) / 60),
                 $grandTotal % 60
             );
-
+            
+            $data['avg_watch_time_hr'] = $grandTotal/($days*3600);
             $data['avg_watch_time'] = sprintf(
                 '%02dh %02dm %02ds',
                 floor(($grandTotal/$days) / 3600),
@@ -608,9 +611,19 @@ class CustomerController extends BaseController
     
     // GET VIDEO LIST
     
-    public function getVideoList(Request $request,$id){
+    public function getVideoList(Request $request){
         try{ 
-            $video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type','category:id,title','userBookmarks'])->select('id','title','category_id','duration','unique_id','can_view_free_user','video_type')->where('category_id',$id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+
+            $validateData = Validator::make($request->all(), [
+                'category_id' => 'required',
+                'type'    => 'required',
+            ]);
+
+            if ($validateData->fails()) {
+                return $this->error($validateData->errors(),'Validation error',403);
+            }
+
+            $video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type','category:id,title','userBookmarks'])->select('id','title','category_id','duration','unique_id','can_view_free_user','video_type')->where('category_id',$request->category_id)->where('video_type',$request->type)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $transformed_video_list  = $video_list->getCollection()->transform(function ($item) {
                 $item->category_title = $item->category->title; 
                 $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false;
@@ -639,10 +652,11 @@ class CustomerController extends BaseController
         try{
             $video   =  Video::where('unique_id',$id)->first();
             if(!empty($video)){
-                $data['can_play'] = 1;
+                $data['access'] = true;
                 $data['video'] = $video;
-                if($video->can_view_free_user == 0){
-                    $data['can_play'] = 0;
+                $purchased_item = UserSubscription::where('user_id',Auth::id())->pluck('category_id')->toArray();
+                if($video->video_type == 1 && !in_array($video->category_id,$purchased_item)){
+                    $data['access'] = false;
                     $data['video'] = null;
                 }
                 return $this->success($data,'Video details');
@@ -697,7 +711,7 @@ class CustomerController extends BaseController
     
     public function getFeaturedList(Request $request){
         try{ 
-            $featured_video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type'])->select('id','title','category_id','duration','unique_id','can_view_free_user')->where('is_featured',1)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $featured_video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type'])->select('id','title','category_id','duration','unique_id','can_view_free_user')->where('is_featured',1)->where('video_type',0)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $transformed_video_list  = $featured_video_list->getCollection()->transform(function ($item) {
                 $item->category_title = $item->category->title; 
                 $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false;
@@ -720,6 +734,106 @@ class CustomerController extends BaseController
         return $this->error('Something went wrong','Something went wrong');
     }
     
+    // GET PDF LIST
+    
+    public function getPdfList(Request $request){
+        try{ 
+
+            $validateData = Validator::make($request->all(), [
+                'category_id' => 'required',
+                'type'    => 'required',
+            ]);
+
+            if ($validateData->fails()) {
+                return $this->error($validateData->errors(),'Validation error',403);
+            }
+
+            $pdf_list = Pdf::with(['image:id,type_id,file_name,type','pdf:id,type_id,file_name,type','category:id,title'])->select('id','title','category_id','unique_id','can_view_free_user','pdf_type')->where('category_id',$request->category_id)->where('pdf_type',$request->type)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $transformed_pdf_list  = $pdf_list->getCollection()->transform(function ($item) {
+                $item->category_title = $item->category->title; 
+                unset($item->category);  
+                return $item;
+            });
+            if(!empty($pdf_list)){
+                $data['pdf_list']      = $transformed_pdf_list->values();
+                $data['current_page']  = $pdf_list->currentPage();
+                $data['per_page']      = $pdf_list->perPage();
+                $data['total']         = $pdf_list->total();
+                $data['last_page']     = $pdf_list->lastPage();
+                return $this->success($data,'Pdf list');
+            }
+            return $this->error('Something went wrong','Something went wrong');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+    
+    // GET SHARE LIST
+    
+    public function getShareContentDetail(Request $request,$id){
+        try{ 
+            $pdf_list = Pdf::with(['image:id,type_id,file_name,type','pdf:id,type_id,file_name,type','category:id,title'])->select('id','title','category_id','unique_id','can_view_free_user','pdf_type')->where('unique_id',$id)->first();
+            $video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type','category:id,title','userBookmarks'])->select('id','title','category_id','duration','unique_id','can_view_free_user','video_type')->where('unique_id',$id)->first();
+
+            $userId = null;
+            $purchased_item  = array();
+            if ($request->bearerToken()) {
+                $userId = auth('api')->user()->id;
+                $purchased_item = UserSubscription::where('user_id',$userId)->pluck('category_id')->toArray();
+            }
+            if (!empty($pdf_list)) {
+                $pdf_list->category_title  = $pdf_list->category->title; 
+                unset($pdf_list->category);
+                $pdf_list->type = 'pdf';
+                $pdf_list->access = true;
+                if($pdf_list->pdf_type == 1 && !in_array($pdf_list->category_id,$purchased_item)){
+                    $pdf_list->access = false;
+                }
+                $data['content_detail']  = $pdf_list;
+                return $this->success($data,'Pdf list');
+            }
+            if (!empty($video_list)) {
+                $video_list->category_title  = $video_list->category->title; 
+                unset($video_list->category);
+                $video_list->type = 'video';
+                $video_list->access = true;
+                if($video_list->video_type == 1 && !in_array($video_list->category_id,$purchased_item)){
+                    $video_list->access = false;
+                }
+                $data['content_detail']  = $video_list;
+                return $this->success($data,'Video list');
+            }
+            return $this->error('Something went wrong','Something went wrong');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+ 
+    
+    public function purchaseSubscription(Request $request){
+        try{
+            $user_id = Auth::id();
+            $is_purchased = UserSubscription::where('user_id',$user_id)->where('category_id','=',$request->category_id)->first();
+            if($is_purchased === null){
+                $plan_data = Category::where('id',$request->category_id)->first();
+                $user_subscription                  =  new UserSubscription();
+                $user_subscription->user_id         =  $user_id; 
+                $user_subscription->category_id     =  $plan_data->id;  
+                $user_subscription->title           =  $plan_data->title; 
+                $user_subscription->price           =  $plan_data->price; 
+                $user_subscription->save(); 
+
+                return $this->success([],'Subscription purchased successfully');
+            }
+            return $this->error('You have already purchased plan','You have already purchased plan');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+
     // USER LOGOUT
 
     public function logout(){

@@ -22,6 +22,10 @@ class Video extends Model
 
     protected $appends = ['thumbnail_image_url','video_url'];
 
+    protected $casts = [
+        'category_id'=> 'int',
+    ];
+
     // ACCESSOR
 
     public function getThumbnailImageUrlAttribute()

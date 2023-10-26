@@ -13,11 +13,13 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('categories', function (Blueprint $table) {
+        Schema::create('pdfs', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('button_title');
-            $table->string('price');
+            $table->string('category_id'); 
+            $table->string('unique_id')->nullable();
+            $table->integer('can_view_free_user')->default(0);
+            $table->integer('pdf_type')->default(0);
             $table->timestamps();
         });
     }
@@ -29,6 +31,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('categories');
+        Schema::dropIfExists('pdfs');
     }
 };

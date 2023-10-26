@@ -1,6 +1,6 @@
 @extends('admin.layout.app')
-@section('title', 'Video Add')
-@section('page', 'Video Add')
+@section('title', 'Pdf Add')
+@section('page', 'Pdf Add')
 @section('content')
 <div class="container-fluid py-4">
     <div class="row">
@@ -8,12 +8,12 @@
             <div class="card my-4">
                 <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
                     <div class="bg-gradient-primary shadow-primary border-radius-lg pt-4 pb-3">
-                        <h6 class="text-white text-capitalize pl-3">Video Add</h6>
+                        <h6 class="text-white text-capitalize pl-3">Pdf Add</h6>
                     </div>
                 </div>
                 <div class="card-body px-0 pb-2">
                     <div class="p-4">
-                        <form method="post" action="{{route('video.store')}}" enctype="multipart/form-data">
+                        <form method="post" action="{{route('pdf.store')}}" enctype="multipart/form-data">
                             @csrf
                             <div>
                                 <div class="form-group">
@@ -55,12 +55,12 @@
                             </div>
                             <div>
                                 <div class="form-group">
-                                    <label class="form-label">Video</label>
-                                    <input type="file" class="form-control h-auto" name="video" autocomplete="off" accept=".mp4,.mkv" />
+                                    <label class="form-label">Pdf</label>
+                                    <input type="file" class="form-control h-auto" name="pdf" autocomplete="off" accept=".pdf" />
                                 </div>
-                                @if($errors->has('video'))
+                                @if($errors->has('pdf'))
                                 <small class="text-danger error">
-                                    {{ $errors->first('video') }}
+                                    {{ $errors->first('pdf') }}
                                 </small>
                                 @endif
                             </div>
@@ -80,15 +80,15 @@
                             </div> -->
                             <div>
                                 <div>
-                                    <p><b>Video type</b></p>
-                                    <input type="radio" name="video_type" value="1"/>
+                                    <p><b>Pdf type</b></p>
+                                    <input type="radio" name="pdf_type" value="1"/>
                                     <label for="paid">Paid</label>
-                                    <input type="radio" class="ml-5" name="video_type" value="0"  checked="checked"/>
+                                    <input type="radio" class="ml-5" name="pdf_type" value="0"  checked="checked"/>
                                     <label for="free">Free</label>
                                 </div>
-                                @if($errors->has('video_type'))
+                                @if($errors->has('pdf_type'))
                                 <small class="text-danger error">
-                                    {{ $errors->first('video_type') }}
+                                    {{ $errors->first('pdf_type') }}
                                 </small>
                                 @endif
                             </div>

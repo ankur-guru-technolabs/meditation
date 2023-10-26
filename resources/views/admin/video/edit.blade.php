@@ -70,7 +70,7 @@
                                 </small>
                                 @endif
                             </div>
-                            <div>
+                            <!-- <div>
                                 <div>
                                     <p><b>Can view free user</b></p>
                                     <input type="radio" name="can_view_free_user" value="1" @checked($videos->can_view_free_user == 1)/>
@@ -83,7 +83,7 @@
                                     {{ $errors->first('can_view_free_user') }}
                                 </small>
                                 @endif
-                            </div>
+                            </div> -->
                             <div>
                                 <div>
                                     <p><b>Video type</b></p>

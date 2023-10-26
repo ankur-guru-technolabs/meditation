@@ -24,8 +24,12 @@ Route::post('login', [AuthController::class, 'login'])->name('login');
 Route::get('get-static-page', [CustomerController::class,'staticPage'])->name('get-static-page');
 
 Route::get('get-category-list', [CustomerController::class,'getCategoryList'])->name('get-category-list');
-Route::get('get-video-list/{id}', [CustomerController::class,'getVideoList'])->name('get-video-list');
+Route::post('get-video-list', [CustomerController::class,'getVideoList'])->name('get-video-list');
 Route::get('get-featured-video-list', [CustomerController::class,'getFeaturedList'])->name('get-featured-list');
+
+Route::post('get-pdf-list', [CustomerController::class,'getPdfList'])->name('get-pdf-list');
+Route::get('get-share-content-detail/{id}', [CustomerController::class,'getShareContentDetail'])->name('get-share-content-detail');
+
 
 Route::middleware('auth:api')->group(function () {
     Route::get('get-user-profile', [CustomerController::class,'getProfile'])->name('get-user-profile');
@@ -57,5 +61,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('contact-support-list', [CustomerController::class,'contactSupportList'])->name('contact-support-list');
     Route::post('contact-support-detail', [CustomerController::class,'contactSupportDetail'])->name('contact-support-detail');
     
+    Route::post('purchase-subscription', [CustomerController::class,'purchaseSubscription'])->name('purchase-subscription');
+
     Route::get('log-out', [CustomerController::class,'logout'])->name('log-out');
 });

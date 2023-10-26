@@ -86,6 +86,23 @@
                         </li>
                     </ul>
                 </li>
+                <li class="nav-item {{isActivePrefix('pdf','menu-open')}} mt-2" role="button">
+                    <a class="nav-link dropDownMenu {{isActive('pdf.list')}}">
+                        <i class="nav-icon fa fa-file-pdf"></i>
+                        <p>
+                            PDF
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a class="nav-link {{isActive('pdf.list')}}" href="{{route('pdf.list')}}">
+                                <i class="fa fa-list-ul nav-icon"></i>
+                                <p>List</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
                 <li class="nav-item {{isActivePrefix('feedback','menu-open')}} mt-2" role="button">
                     <a class="nav-link dropDownMenu {{isActive('feedback.list')}}">
                         <i class="nav-icon fa fa-comment"></i>

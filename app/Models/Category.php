@@ -11,7 +11,8 @@ class Category extends Model
 
     protected $fillable = [
         'title',
-        'button_title'
+        'button_title',
+        'price'
     ];
 
     // RELATIONSHIPS

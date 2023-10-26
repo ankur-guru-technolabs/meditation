@@ -40,6 +40,17 @@
                             </div>
                             <div>
                                 <div class="form-group">
+                                    <label class="form-label">Price</label>
+                                    <input type="number" class="form-control" name="price" value="{{$categories->price}}" autocomplete="off" step="any">
+                                </div>
+                                @if($errors->has('price'))
+                                    <small class="text-danger error" >
+                                        {{ $errors->first('price') }}
+                                    </small>
+                                @endif
+                            </div>
+                            <div>
+                                <div class="form-group">
                                     <label class="form-label">Image</label>
                                     <input type="file" class="form-control h-auto" name="image" autocomplete="off" accept="image/png, image/gif, image/jpeg"/>
                                 </div>
