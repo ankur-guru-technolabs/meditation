@@ -711,11 +711,9 @@ class CustomerController extends BaseController
     
     public function getFeaturedList(Request $request){
         try{ 
-            $featured_video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type'])->select('id','title','category_id','duration','unique_id','can_view_free_user')->where('is_featured',1)->where('video_type',0)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $featured_video_list = Video::with(['category'=> function ($query) {$query->with('image');},'image:id,type_id,file_name,type','video:id,type_id,file_name,type'])->select('id','title','category_id','duration','unique_id','can_view_free_user')->where('is_featured',1)->where('video_type',0)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $transformed_video_list  = $featured_video_list->getCollection()->transform(function ($item) {
-                $item->category_title = $item->category->title; 
-                $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false;
-                // unset($item->category);  
+                $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false; 
                 unset($item->userBookmarks);  
                 return $item;
             });
