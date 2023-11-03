@@ -715,7 +715,7 @@ class CustomerController extends BaseController
             $transformed_video_list  = $featured_video_list->getCollection()->transform(function ($item) {
                 $item->category_title = $item->category->title; 
                 $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false;
-                unset($item->category);  
+                // unset($item->category);  
                 unset($item->userBookmarks);  
                 return $item;
             });
