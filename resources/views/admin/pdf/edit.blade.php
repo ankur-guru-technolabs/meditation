@@ -44,24 +44,24 @@
                                 </small>
                                 @endif
                             </div>
-                            <div>
+                            <!-- <div>
                                 <div class="form-group">
                                     <label class="form-label">Image</label>
                                     <input type="file" class="form-control h-auto" name="image" autocomplete="off" accept="image/png, image/gif, image/jpeg" />
                                 </div>
-                                <img style="height:100px; width:100px;object-fit: contain;" src="{{$pdfs->image->image_url}}" />
+                                <img style="height:100px; width:100px;object-fit: contain;" src="{{$pdfs->image->image_url ?? ''}}" />
                                 @if($errors->has('image'))
                                 <small class="text-danger error">
                                     {{ $errors->first('image') }}
                                 </small>
                                 @endif
-                            </div>
+                            </div> -->
                             <div class="mt-3">
                                 <div class="form-group">
                                     <label class="form-label">Pdf</label>
                                     <input type="file" class="form-control h-auto" name="pdf" autocomplete="off" accept=".pdf" />
                                 </div>
-                                <a href="{{ $pdfs->pdf->image_url }}" target="_blank"><img style="height:70px; width:70px;object-fit: contain;" src="{{asset('images/pdf.png')}}"></a>
+                                <a href="{{ $pdfs->pdf->image_url ?? ''}}" target="_blank"><img style="height:70px; width:70px;object-fit: contain;" src="{{asset('images/pdf.png')}}"></a>
                                 @if($errors->has('pdf'))
                                 <small class="text-danger error">
                                     {{ $errors->first('pdf') }}

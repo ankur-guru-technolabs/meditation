@@ -399,7 +399,7 @@ class AdminController extends BaseController
         $validator = Validator::make($request->all(),[
             'title'               => "required",
             'category'            => "required", 
-            'image'               => "required|mimes:jpeg,png,jpg",
+            // 'image'               => "required|mimes:jpeg,png,jpg",
             'pdf'                 => "required|mimes:pdf",
             'pdf_type'            => "required",
         ]);
@@ -429,18 +429,18 @@ class AdminController extends BaseController
         $pdf->unique_id           = $code; 
         $pdf->save();
 
-        $folderPath = public_path().'/pdf';
-        if (!is_dir($folderPath)) {
-            mkdir($folderPath, 0777, true);
-        }
+        // $folderPath = public_path().'/pdf';
+        // if (!is_dir($folderPath)) {
+        //     mkdir($folderPath, 0777, true);
+        // }
 
         // For storing thumbnail image
-        $mediaFiles = $request->file('image');
-        $extension = $mediaFiles->getClientOriginalExtension();
-        $filename = 'Pdf_thumbnail_' . $pdf->id . '_' . random_int(10000, 99999) . '.' . $extension;
-        $mediaFiles->move(public_path('pdf'), $filename);
+        // $mediaFiles = $request->file('image');
+        // $extension = $mediaFiles->getClientOriginalExtension();
+        // $filename = 'Pdf_thumbnail_' . $pdf->id . '_' . random_int(10000, 99999) . '.' . $extension;
+        // $mediaFiles->move(public_path('pdf'), $filename);
         
-        $media_array = ['type_id'=>$pdf->id,'file_name'=>$filename,'type' => 'pdf_thumbnail_image','created_at' => now() , 'updated_at' => now()];
+        // $media_array = ['type_id'=>$pdf->id,'file_name'=>$filename,'type' => 'pdf_thumbnail_image','created_at' => now() , 'updated_at' => now()];
         
         // For storing pdf image
         $pdfFiles = $request->file('pdf');
@@ -449,15 +449,16 @@ class AdminController extends BaseController
         $pdfFiles->move(public_path('pdf'), $pdf_file_name);
 
         $pdf_array = ['type_id'=>$pdf->id,'file_name'=>$pdf_file_name,'type' => 'pdf','created_at' => now() , 'updated_at' => now()];
+        Image::insert($pdf_array);
 
-        $final_array = array($media_array,$pdf_array);
+        // $final_array = array($media_array,$pdf_array);
 
-        Image::insert($final_array);
+        // Image::insert($final_array);
 
         $title = $request->title." has been uploaded to the app";
         $message = $request->title." has been uploaded to the app";
-        $data['image'] = asset('/pdf/' . $filename); 
-        Helper::send_notification_by_admin($title,$message,$data);
+        // $data['image'] = asset('/pdf/' . $filename); 
+        Helper::send_notification_by_admin($title,$message,[]);
 
         return redirect()->route('pdf.list')->with('message','Pdf Added Successfully'); 
     }
@@ -557,7 +558,7 @@ class AdminController extends BaseController
             }
             $image_data->each->delete();
         }
-        return redirect()->route('PDF.list')->with('message','Pdf Deleted Successfully');
+        return redirect()->route('pdf.list')->with('message','Pdf Deleted Successfully');
     }
 
     // FEEDBACK

@@ -42,7 +42,7 @@
                                 </small>
                                 @endif
                             </div>
-                            <div>
+                            <!-- <div>
                                 <div class="form-group">
                                     <label class="form-label">Thumbnail Image</label>
                                     <input type="file" class="form-control h-auto" name="image" autocomplete="off" accept="image/png, image/gif, image/jpeg" />
@@ -52,7 +52,7 @@
                                     {{ $errors->first('image') }}
                                 </small>
                                 @endif
-                            </div>
+                            </div> -->
                             <div>
                                 <div class="form-group">
                                     <label class="form-label">Pdf</label>
