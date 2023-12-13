@@ -31,6 +31,7 @@ Route::post('get-pdf-list', [CustomerController::class,'getPdfList'])->name('get
 Route::get('get-share-content-detail/{id}', [CustomerController::class,'getShareContentDetail'])->name('get-share-content-detail');
 
 
+Route::post('search-video', [CustomerController::class,'searchVideo'])->name('search-video');
 Route::middleware('auth:api')->group(function () {
     Route::get('get-user-profile', [CustomerController::class,'getProfile'])->name('get-user-profile');
     Route::post('update-profile', [CustomerController::class,'updateProfile'])->name('update-profile');
@@ -52,7 +53,7 @@ Route::middleware('auth:api')->group(function () {
     Route::get('get-category-name', [CustomerController::class,'getCategoryName'])->name('get-category-name');
     Route::get('get-video-name/{id}', [CustomerController::class,'getVideoName'])->name('get-video-name');
     Route::post('get-statistics', [CustomerController::class,'getStatistics'])->name('get-statistics');
-    Route::post('search-video', [CustomerController::class,'searchVideo'])->name('search-video');
+    // Route::post('search-video', [CustomerController::class,'searchVideo'])->name('search-video');
     Route::get('play-video/{id}', [CustomerController::class,'playVideo'])->name('play-video');
     
     Route::post('store-watched-video-duration', [CustomerController::class,'storeWatchedVideoDuration'])->name('store-watched-video-duration');

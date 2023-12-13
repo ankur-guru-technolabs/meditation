@@ -420,17 +420,19 @@ class CustomerController extends BaseController
                 }
             });
             
-            $video_list = $query->where('title','LIKE','%'.$request->searched_title.'%')->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $video_list = $query->with(['category'=> function ($query) {$query->with('image');}])->where('title','LIKE','%'.$request->searched_title.'%')->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $formattedVideoList = $video_list->map(function ($videos) {
                 if ($videos->video) {
                     $videos->category_title = $videos->category->title ?? null;
-                    $videos->makeHidden(['image','video','category']);
+                    $videos->is_featured    = (int)$videos->is_featured;
+                    $videos->is_bookmark      =  $videos->userBookmarks->isNotEmpty() ? true : false;
+                    // $videos->makeHidden(['image','video','category']);
                 }
                 return $videos;
             });
             
             if(!empty($video_list)){
-                $data['video_list']             = $video_list->values();
+                $data['list']                   = $video_list->values();
                 $data['current_page']           = $video_list->currentPage();
                 $data['per_page']               = $video_list->perPage();
                 $data['total']                  = $video_list->total();
@@ -621,18 +623,18 @@ class CustomerController extends BaseController
 
             if ($validateData->fails()) {
                 return $this->error($validateData->errors(),'Validation error',403);
-            }
-
-            $video_list = Video::with(['image:id,type_id,file_name,type','video:id,type_id,file_name,type','category:id,title','userBookmarks'])->select('id','title','category_id','duration','unique_id','can_view_free_user','video_type')->where('category_id',$request->category_id)->where('video_type',$request->type)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            } 
+            $video_list = Video::with(['category'=> function ($query) {$query->with('image');},'image:id,type_id,file_name,type','video:id,type_id,file_name,type','userBookmarks'])->select('id','title','category_id','duration','is_featured','unique_id','can_view_free_user','video_type','created_at','updated_at')->where('category_id',$request->category_id)->where('video_type',$request->type)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $transformed_video_list  = $video_list->getCollection()->transform(function ($item) {
                 $item->category_title = $item->category->title; 
                 $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false;
-                unset($item->category);  
+                $item->is_featured    = (int)$item->is_featured;
+                // unset($item->category);  
                 unset($item->userBookmarks);  
                 return $item;
             });
             if(!empty($video_list)){
-                $data['video_list']    = $transformed_video_list->values();
+                $data['list']          = $transformed_video_list->values();
                 $data['current_page']  = $video_list->currentPage();
                 $data['per_page']      = $video_list->perPage();
                 $data['total']         = $video_list->total();
@@ -711,14 +713,15 @@ class CustomerController extends BaseController
     
     public function getFeaturedList(Request $request){
         try{ 
-            $featured_video_list = Video::with(['category'=> function ($query) {$query->with('image');},'image:id,type_id,file_name,type','video:id,type_id,file_name,type'])->select('id','title','category_id','duration','unique_id','can_view_free_user')->where('is_featured',1)->where('video_type',0)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $featured_video_list = Video::with(['category'=> function ($query) {$query->with('image');},'image:id,type_id,file_name,type','video:id,type_id,file_name,type'])->select('id','title','category_id','duration','is_featured','unique_id','can_view_free_user','created_at','updated_at')->where('is_featured',1)->where('video_type',0)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $transformed_video_list  = $featured_video_list->getCollection()->transform(function ($item) {
                 $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false; 
+                $item->is_featured    = (int)$item->is_featured;
                 unset($item->userBookmarks);  
                 return $item;
             });
             if(!empty($featured_video_list)){
-                $data['featured_video_list']    = $featured_video_list->values();
+                $data['list']                   = $featured_video_list->values();
                 $data['current_page']           = $featured_video_list->currentPage();
                 $data['per_page']               = $featured_video_list->perPage();
                 $data['total']                  = $featured_video_list->total();
@@ -746,14 +749,14 @@ class CustomerController extends BaseController
                 return $this->error($validateData->errors(),'Validation error',403);
             }
 
-            $pdf_list = Pdf::with(['image:id,type_id,file_name,type','pdf:id,type_id,file_name,type','category:id,title'])->select('id','title','category_id','unique_id','can_view_free_user','pdf_type')->where('category_id',$request->category_id)->where('pdf_type',$request->type)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $pdf_list = Pdf::with(['category'=> function ($query) {$query->with('image');},'image:id,type_id,file_name,type','pdf:id,type_id,file_name,type'])->select('id','title','category_id','unique_id','can_view_free_user','pdf_type','created_at','updated_at')->where('category_id',$request->category_id)->where('pdf_type',$request->type)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $transformed_pdf_list  = $pdf_list->getCollection()->transform(function ($item) {
                 $item->category_title = $item->category->title; 
-                unset($item->category);  
+                // unset($item->category);  
                 return $item;
             });
             if(!empty($pdf_list)){
-                $data['pdf_list']      = $transformed_pdf_list->values();
+                $data['list']          = $transformed_pdf_list->values();
                 $data['current_page']  = $pdf_list->currentPage();
                 $data['per_page']      = $pdf_list->perPage();
                 $data['total']         = $pdf_list->total();
