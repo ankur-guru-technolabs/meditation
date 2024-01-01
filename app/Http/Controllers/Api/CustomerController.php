@@ -835,6 +835,62 @@ class CustomerController extends BaseController
         return $this->error('Something went wrong','Something went wrong');
     }
 
+    // GET PURCHASE LIST
+    
+    public function getPurchaseSubscriptionList(Request $request){
+        try{ 
+            $user_id = Auth::id();
+            $category_list = UserSubscription::with(['category'=> function ($query) {$query->with('image:id,type_id,file_name,type');}])->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            if($category_list !== null){
+                if(!empty($category_list)){
+                    $data['category_list'] = $category_list->values();
+                    $data['current_page']  = $category_list->currentPage();
+                    $data['per_page']      = $category_list->perPage();
+                    $data['total']         = $category_list->total();
+                    $data['last_page']     = $category_list->lastPage();
+                    
+                    return $this->success($data,'Category list');
+                }
+                return $this->success([],'Subscription purchased list');
+            }
+            return $this->success('Not purchases any subscription','Not purchases any subscription');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+   
+    // GET CURRENTLY PROGRESS LIST
+    
+    public function getCurrentlyProgress(Request $request){
+        try{ 
+            $user_id = Auth::id();
+            $category_list = WatchVideoDuration::with(['category'=> function ($query) {$query->with('image:id,type_id,file_name,type');}])
+                            ->join('categories', 'categories.id', '=', 'watch_video_durations.category_id')
+                            ->where('watch_video_durations.user_id',$user_id)
+                            ->whereRaw('CAST(categories.price AS DECIMAL(10, 2)) > 0.00')
+                            ->groupBy('watch_video_durations.category_id')
+                            ->orderBy('watch_video_durations.id')
+                            ->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            if($category_list !== null){
+                if(!empty($category_list)){
+                    $data['category_list'] = $category_list->values();
+                    $data['current_page']  = $category_list->currentPage();
+                    $data['per_page']      = $category_list->perPage();
+                    $data['total']         = $category_list->total();
+                    $data['last_page']     = $category_list->lastPage();
+                    
+                    return $this->success($data,'Category list');
+                }
+                return $this->success([],'Subscription purchased list');
+            }
+            return $this->success('Not purchases any subscription','Not purchases any subscription');
+        }catch(Exception $e){
+            return $this->error($e->getMessage(),'Exception occur');
+        }
+        return $this->error('Something went wrong','Something went wrong');
+    }
+
     // USER LOGOUT
 
     public function logout(){

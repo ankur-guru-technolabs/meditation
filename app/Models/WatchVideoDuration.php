@@ -16,4 +16,9 @@ class WatchVideoDuration extends Model
         'duration',
         'play_date'
     ];
+
+    public function category()
+    {
+        return $this->hasOne(Category::class,'id','category_id');
+    }
 }
