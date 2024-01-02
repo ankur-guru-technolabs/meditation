@@ -24,4 +24,9 @@ class UserSubscription extends Model
     public function subscriptionOrder(){
         return $this->belongsTo(Subscription::class,'subscription_id');
     }
+
+    public function category()
+    {
+        return $this->hasOne(Category::class,'id','category_id');
+    }
 }

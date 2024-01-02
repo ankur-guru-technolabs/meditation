@@ -63,6 +63,8 @@ Route::middleware('auth:api')->group(function () {
     Route::post('contact-support-detail', [CustomerController::class,'contactSupportDetail'])->name('contact-support-detail');
     
     Route::post('purchase-subscription', [CustomerController::class,'purchaseSubscription'])->name('purchase-subscription');
+    Route::get('get-purchase-list', [CustomerController::class,'getPurchaseSubscriptionList'])->name('get-purchase-list');
+    Route::get('get-currently-progress', [CustomerController::class,'getCurrentlyProgress'])->name('get-currently-progress');
 
     Route::get('log-out', [CustomerController::class,'logout'])->name('log-out');
 });
