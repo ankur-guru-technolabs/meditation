@@ -18,11 +18,11 @@ class AdminSeeder extends Seeder
         //
         $admin = User::create([
             'name' => 'Admin user',
-            'email' => 'admin@gmail.com',
+            'email' => 'james@meetnow.com',
             'phone_no' => '+911234567890',
             'birth_date' => '1999-05-15',
             'gender' => "male",
-            'password' => bcrypt('123456'),
+            'password' => bcrypt('James1234!@#'),
             'user_type' =>'admin',
             'status' => 1
         ]);
