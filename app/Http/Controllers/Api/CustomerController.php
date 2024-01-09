@@ -641,12 +641,23 @@ class CustomerController extends BaseController
             if ($validateData->fails()) {
                 return $this->error($validateData->errors(),'Validation error',403);
             } 
+            $userId = 0;
+            if ($request->bearerToken()) {
+                $userId = auth('api')->user()->id;
+            }
             $video_list = Video::with(['category'=> function ($query) {$query->with('image');},'image:id,type_id,file_name,type','video:id,type_id,file_name,type','userBookmarks'])->select('id','title','category_id','duration','is_featured','unique_id','can_view_free_user','video_type','created_at','updated_at')->where('category_id',$request->category_id)->where('video_type',$request->type)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
-            $transformed_video_list  = $video_list->getCollection()->transform(function ($item) {
+            $transformed_video_list  = $video_list->getCollection()->transform(function ($item) use ($userId){
                 $item->category_title = $item->category->title; 
                 $item->is_bookmark    = $item->userBookmarks->isNotEmpty() ? true : false;
                 $item->is_featured    = (int)$item->is_featured;
-                // unset($item->category);  
+                // unset($item->category);
+                if($item->category->price < 1){
+                    $item->category->is_purchased = true; 
+                }else if($userId == 0){
+                    $item->category->is_purchased = false; 
+                }else{
+                    $item->category->is_purchased = UserSubscription::where('category_id', $item->category->id)->where('user_id', $userId)->exists();
+                };
                 unset($item->userBookmarks);  
                 return $item;
             });
