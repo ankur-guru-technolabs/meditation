@@ -594,9 +594,26 @@ class CustomerController extends BaseController
 
     public function getCategoryList(Request $request){
         try{ 
-            $category_list = Category::with('image:id,type_id,file_name,type')->select('id','title','button_title')->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $userId = 0;
+            if ($request->bearerToken()) {
+                $userId = auth('api')->user()->id;
+            }
+            $category_list = Category::with('image:id,type_id,file_name,type')->select('id','title','button_title','price')->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             if(!empty($category_list)){
-                $data['category_list'] = $category_list->values();
+
+                $transformed_category_list  = $category_list->getCollection()->transform(function ($item) use ($userId) {
+                    if($item->price < 1){
+                        $item->is_purchased = true; 
+                    }else if($userId == 0){
+                        $item->is_purchased = false; 
+                    }else{
+                        $item->is_purchased = UserSubscription::where('category_id', $item->id)->where('user_id', $userId)->exists();
+                    };
+                    return $item;
+                });
+                 
+
+                $data['category_list'] = $transformed_category_list->values();
                 $data['current_page']  = $category_list->currentPage();
                 $data['per_page']      = $category_list->perPage();
                 $data['total']         = $category_list->total();
