@@ -28,7 +28,7 @@ class Pdf extends Model
 
     public function getThumbnailImageUrlAttribute()
     {
-        if($this->image->type == 'pdf_thumbnail_image'){
+        if(isset($this->image->type) && $this->image->type == 'pdf_thumbnail_image'){
             return asset('/pdf/' . $this->image->file_name);
         }
         return null;
