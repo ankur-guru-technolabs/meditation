@@ -15,6 +15,7 @@ class UserSubscription extends Model
         'category_id',
         'title',
         'price',
+        'transaction_id'
     ];
 
     public function user()
