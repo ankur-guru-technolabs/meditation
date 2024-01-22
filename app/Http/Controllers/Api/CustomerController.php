@@ -852,7 +852,7 @@ class CustomerController extends BaseController
                 $user_subscription->category_id     =  $plan_data->id;  
                 $user_subscription->title           =  $plan_data->title; 
                 $user_subscription->price           =  $plan_data->price; 
-                $user_subscription->transaction_id  =  $plan_data->transaction_id; 
+                $user_subscription->transaction_id  =  $request->transaction_id; 
                 $user_subscription->save(); 
 
                 return $this->success([],'Subscription purchased successfully');
