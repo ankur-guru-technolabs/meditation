@@ -13,6 +13,7 @@ use App\Models\Pdf;
 use App\Models\Setting; 
 use App\Models\Video; 
 use App\Models\User; 
+use App\Models\UserSubscription; 
 use Validator;
 use Helper; 
 use Auth;
@@ -566,6 +567,13 @@ class AdminController extends BaseController
     public function feedbackList(){
         $feedbacks = ContactSupport::all();
         return view('admin.feedback.list',compact('feedbacks'));
+    }
+
+    // USER SUBSCRIPTION LIST
+
+    public function userSubscriptionList(){
+        $userSubscription = UserSubscription::with('user','category')->get();
+        return view('admin.usersubscription.list',compact('userSubscription'));
     }
 
     // SETTING

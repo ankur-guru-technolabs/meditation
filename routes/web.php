@@ -67,6 +67,10 @@ Route::middleware(['admin'])->group(function () {
         Route::get('list', [AdminController::class, 'feedbackList'])->name('list');
     });
     
+    Route::group(['prefix' => 'user/subscription','as'=>'userSubscription.'], function () {
+        Route::get('list', [AdminController::class, 'userSubscriptionList'])->name('list');
+    });
+    
     Route::group(['prefix' => 'static-pages','as'=>'static-pages.'], function () {
         Route::get('list', [AdminController::class, 'staticPagesList'])->name('list');
         Route::get('page-edit/{id}', [AdminController::class, 'pageEdit'])->name('page-edit');

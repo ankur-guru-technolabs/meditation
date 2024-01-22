@@ -120,6 +120,23 @@
                         </li>
                     </ul>
                 </li> 
+                <li class="nav-item {{isActivePrefix('user/subscription','menu-open')}} mt-2" role="button">
+                    <a class="nav-link dropDownMenu {{isActive('userSubscription.list')}}">
+                        <i class="nav-icon fa fa-comment"></i>
+                        <p>
+                            User Subscription
+                            <i class="right fas fa-angle-left"></i>
+                        </p>
+                    </a>
+                    <ul class="nav nav-treeview">
+                        <li class="nav-item">
+                            <a class="nav-link {{isActive('userSubscription.list')}}" href="{{route('userSubscription.list')}}">
+                                <i class="fa fa-list-ul nav-icon"></i>
+                                <p>List</p>
+                            </a>
+                        </li>
+                    </ul>
+                </li> 
                 <li class="nav-item {{isActivePrefix('static-pages','menu-open')}} mt-2" role="button">
                     <a class="nav-link dropDownMenu {{isActive('static-pages.list')}}">
                         <i class="nav-icon  fa fa-file-alt"></i>
