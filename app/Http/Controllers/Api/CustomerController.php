@@ -107,11 +107,20 @@ class CustomerController extends BaseController
     public function getBookmarkList(Request $request){
         try{ 
             $user_id = Auth::user()->id;
-            $bookmark_video_list = Bookmark::with(['video:id,title,category_id,unique_id,can_view_free_user,duration'])->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
-            $formattedBookmarkList = $bookmark_video_list->map(function ($bookmark) {
+            $bookmark_video_list = Bookmark::with(['video','video.category' => function ($query) {
+                $query->with('image');
+            }])->where('user_id',$user_id)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
+            $formattedBookmarkList = $bookmark_video_list->map(function ($bookmark) use ($user_id){
                 if ($bookmark->video) {
                     $bookmark->category_title = $bookmark->video->category->title ?? null;
-                    $bookmark->video->makeHidden(['image','video','category']);
+                    if($bookmark->video->category->price < 1){
+                        $bookmark->video->category->is_purchased = true; 
+                    }else if($user_id == 0){
+                        $bookmark->video->category->is_purchased = false; 
+                    }else{
+                        $bookmark->video->category->is_purchased = UserSubscription::where('category_id', $bookmark->video->category->id)->where('user_id', $user_id)->exists();
+                    };
+                    // $bookmark->video->makeHidden(['image','video','category']);
                 }
                 return $bookmark;
             });
