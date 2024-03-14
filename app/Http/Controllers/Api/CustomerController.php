@@ -789,7 +789,14 @@ class CustomerController extends BaseController
             $pdf_list = Pdf::with(['category'=> function ($query) {$query->with('image');},'image:id,type_id,file_name,type','pdf:id,type_id,file_name,type'])->select('id','title','category_id','unique_id','can_view_free_user','pdf_type','created_at','updated_at')->where('category_id',$request->category_id)->where('pdf_type',$request->type)->paginate($request->input('perPage'), ['*'], 'page', $request->input('page'));
             $transformed_pdf_list  = $pdf_list->getCollection()->transform(function ($item) {
                 $item->category_title = $item->category->title; 
-                // unset($item->category);  
+                // unset($item->category); 
+                if($item->category->price < 1){
+                    $item->category->is_purchased = true; 
+                }else if($userId == 0){
+                    $item->category->is_purchased = false; 
+                }else{
+                    $item->category->is_purchased = UserSubscription::where('category_id', $item->category->id)->where('user_id', $userId)->exists();
+                };
                 return $item;
             });
             if(!empty($pdf_list)){
