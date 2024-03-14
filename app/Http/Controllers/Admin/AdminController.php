@@ -353,7 +353,11 @@ class AdminController extends BaseController
         $videos = Video::findOrFail($id);
         $videos->delete();
 
-        $image_data = Image::where('type_id',$id)->where('type','video_thumbnail_image')->orWhere('type','video')->get();
+       
+        $image_data =   Image::whereIn('type_id',$id)->where(function ($query) {
+                            $query->where('type', 'video_thumbnail_image')
+                                ->orWhere('type', 'video');
+                        })->get();
         
         if($image_data){
             foreach($image_data as $key=>$image){
