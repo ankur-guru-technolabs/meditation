@@ -297,7 +297,7 @@ class AdminController extends BaseController
                 mkdir($folderPath, 0777, true);
             }
             if($request->file('image') != null){
-                $image_data = Image::where('type','video_thumbnail_image')->first();
+                $image_data = Image::where('type','video_thumbnail_image')->where('type_id',$request->id)->first();
 
                 if($image_data){
                     $path = public_path('video/' . $image_data->file_name);
@@ -319,7 +319,7 @@ class AdminController extends BaseController
             }
            
             if($request->file('video') != null){
-                $video_data = Image::where('type','video')->first();
+                $video_data = Image::where('type','video')->where('type_id',$request->id)->first();
 
                 if($video_data){
                     $path = public_path('video/' . $video_data->file_name);
@@ -500,7 +500,7 @@ class AdminController extends BaseController
                 mkdir($folderPath, 0777, true);
             }
             if($request->file('image') != null){
-                $image_data = Image::where('type','pdf_thumbnail_image')->first();
+                $image_data = Image::where('type','pdf_thumbnail_image')->where('type_id',$request->id)->first();
 
                 if($image_data){
                     $path = public_path('pdf/' . $image_data->file_name);
@@ -522,7 +522,7 @@ class AdminController extends BaseController
             }
            
             if($request->file('pdf') != null){
-                $pdf_data = Image::where('type','pdf')->first();
+                $pdf_data = Image::where('type','pdf')->where('type_id',$request->id)->first();
 
                 if($pdf_data){
                     $path = public_path('pdf/' . $pdf_data->file_name);
@@ -551,8 +551,10 @@ class AdminController extends BaseController
         $pdfs = Pdf::findOrFail($id);
         $pdfs->delete();
 
-        $image_data = Image::where('type_id',$id)->where('type','pdf_thumbnail_image')->orWhere('type','pdf')->get();
-        
+        $image_data =  Image::whereIn('type_id',$id)->where(function ($query) {
+                            $query->where('type', 'pdf_thumbnail_image')
+                                ->orWhere('type', 'pdf');
+                        })->get();
         if($image_data){
             foreach($image_data as $key=>$image){
                 $path = public_path('pdf/' . $image->file_name);
